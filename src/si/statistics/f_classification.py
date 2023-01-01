@@ -16,7 +16,9 @@ def f_classification(dataset: Dataset):
 	F value for each feature.
     """
     dataset_classes = dataset.get_classes()
-    dataset_groups = [dataset.x[dataset.y == c] for c in dataset_classes]  # group the dataset by class
+	# groups the dataset by class
+    dataset_groups = [dataset.x[dataset.y == c] for c in dataset_classes]
+	# if I have a list, it will extract
     f_value, p_value = stats.f_oneway(*dataset_groups)
 
     return f_value, p_value

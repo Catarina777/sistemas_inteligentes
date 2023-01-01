@@ -5,17 +5,6 @@ from pandas import isnull
 
 
 class Dataset:
-	"""
-	Class that represents a dataset.
-
-	Attributes
-	----------
-	x : ndarray
-	y: ndarray
-	features_names: list
-	label_name: str
-	"""
-
 	def __init__(self, x: ndarray, y: ndarray = None, features_names: list = None, label_name: str = None):
 		"""
 		Initializes the dataset.
@@ -43,7 +32,7 @@ class Dataset:
 		self.features_names = features_names
 		self.label_name = label_name
 
-	def shape(self):
+	def shape(self) -> tuple[int, int]:
 		"""
 		Returns the shape of the dataset.
 
@@ -53,7 +42,7 @@ class Dataset:
 		"""
 		return self.x.shape
 
-	def has_label(self):
+	def has_label(self) -> bool:
 		"""
 		Checks if the dataset has a label.
 
@@ -61,12 +50,12 @@ class Dataset:
 		------------
 		Boolean
 		"""
+		# If the y exists it means that is supervised
 		if self.y is not None:
 			return True
-
 		return False
 
-	def get_classes(self):
+	def get_classes(self) -> np.ndarray:
 		"""
 		Returns the classes of the dataset.
 
@@ -78,7 +67,7 @@ class Dataset:
 			raise ValueError("Dataset does not have a label")
 		return np.unique(self.y)
 
-	def get_mean(self):
+	def get_mean(self) -> np.ndarray:
 		"""
 		Returns the mean of the dataset for each feature.
 
@@ -88,7 +77,7 @@ class Dataset:
 		"""
 		return np.mean(self.x, axis=0)
 
-	def get_variance(self):
+	def get_variance(self) -> np.ndarray:
 		"""
 		Returns the variance of the dataset for each feature.
 
@@ -98,7 +87,7 @@ class Dataset:
 		"""
 		return np.var(self.x, axis=0)
 
-	def get_median(self):
+	def get_median(self) -> np.ndarray:
 		"""
 		Returns the median of the dataset for each feature.
 
@@ -108,7 +97,7 @@ class Dataset:
 		"""
 		return np.median(self.x, axis=0)
 
-	def get_min(self):
+	def get_min(self) -> np.ndarray:
 		"""
 		Returns the minimum value of the dataset for each feature.
 
@@ -118,7 +107,7 @@ class Dataset:
 		"""
 		return np.min(self.x, axis=0)
 
-	def get_max(self):
+	def get_max(self) -> np.ndarray:
 		"""
 		Returns the maximum value of the dataset for each feature.
 
@@ -171,28 +160,9 @@ class Dataset:
 
 
 if __name__ == '__main__':
-	# x = np.array([[1, 2, 3], [1, 2, 3]])
-	# y = np.array([1, 2])
-	# features = ["A", "B", "C"]
-	# label = "y"
-	# dataset = Dataset(x=x, y=y, features_names=features, label_name=label)
-
-	# print(dataset.shape())
-	# print(dataset.has_label())
-	# print(dataset.get_classes())
-	# print(dataset.get_mean())
-	# print(dataset.get_variance())
-	# print(dataset.get_median())
-	# print(dataset.get_min())
-	# print(dataset.get_max())
-	# print(dataset.summary())
-
-	x = np.array([[1, 2, 3], [1, 2, 3], [1, None, 3], [1, 2, 3], [None, 2, 3]])
-	y = np.array([1, 2, 4, 4, 5])
-	features = ["A", "B", "C"]
-	label = "y"
-	dataset = Dataset(x=x, y=y, features_names=features, label_name=label)
-
-	print(dataset.shape())
-	print(dataset.remove_nan().shape())
-	# print(dataset.replace_nan(16))
+    x1 = np.array([[1,2,3], [2,4,6], [3,np.nan,7], [8,6,np.nan]])
+    y1 = np.array([2,4,5])
+    dataset2 = Dataset(X=x1, y=y1)
+    print(dataset2.shape())  # before
+    dataset2.dropna()
+    print(dataset2.shape())

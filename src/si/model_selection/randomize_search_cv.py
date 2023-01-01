@@ -25,10 +25,8 @@ def randomized_search_cv(model, dataset: Dataset, parameter_distribution: Dict[s
 	"""
 
 	scores = []
-
 	# for each combination
 	for i in range(n_iter):
-
 		# parameter configuration
 		parameters = {}
 
@@ -41,11 +39,12 @@ def randomized_search_cv(model, dataset: Dataset, parameter_distribution: Dict[s
 
 		# cross validate the model
 		score = cross_validate(model = model, dataset = dataset, scoring = scoring, cv = cv, test_size = test_size)
-
 		# add the parameter configuration
 		score['parameters'] = parameters
-
 		# add the score
 		scores.append(score)
 
 	return scores
+
+
+

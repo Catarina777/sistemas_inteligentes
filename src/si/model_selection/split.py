@@ -35,10 +35,7 @@ def train_test_split(dataset: Dataset, test_size: float = 0.3, random_state: int
     train_idx = permutations[split_div:]
 
     # get the training and testing datasets
-    train = Dataset(dataset.x[train_idx], dataset.y[train_idx], features_names=dataset.features_names,
-                    label_name=dataset.label_name)
-
-    test = Dataset(dataset.x[test_idx], dataset.y[test_idx], features_names=dataset.features_names,
-                   label_name=dataset.label_name)
+    train = Dataset(dataset.x[train_idx], dataset.y[train_idx], features_names=dataset.features_names, label_name=dataset.label_name)
+    test = Dataset(dataset.x[test_idx], dataset.y[test_idx], features_names=dataset.features_names, label_name=dataset.label_name)
 
     return train, test

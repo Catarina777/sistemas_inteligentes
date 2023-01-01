@@ -12,17 +12,6 @@ class RidgeRegression:
 	"""
 	The RidgeRegression is a linear model using the L2 regularization.
 	This model solves the linear regression problem using an adapted Gradient Descent technique.
-
-	Attributes
-	------------
-	theta: np.array
-		The model parameters, namely the coefficients of the linear model.
-		For example, x0 * theta[0] + x1 * theta[1] + ...
-	theta_zero: float
-		The model parameter, namely the intercept of the linear model.
-		For example, theta_zero * 1
-	cost_history: dict
-		The history of the cost function of the model.
 	"""
 
 	def __init__(self, use_adaptive_alpha: bool = True, l2_penalty: float = 1, alpha: float = 0.001, max_iter: int = 2000):
@@ -35,6 +24,12 @@ class RidgeRegression:
 		l2_penalty: L2 regularization parameter
 		alpha: Learning rate
 		max_iter: Maximum number of iterations
+
+		Attributes
+		------------
+		theta: The model parameters, namely the coefficients of the linear model. For example, x0 * theta[0] + x1 * theta[1] + ...
+		theta_zero: The model parameter, namely the intercept of the linear model.
+		cost_history: The history of the cost function of the model.
 		"""
 		# parameters
 		self.use_adaptive_alpha = use_adaptive_alpha
@@ -43,7 +38,6 @@ class RidgeRegression:
 		self.alpha = alpha
 		self.max_iter = max_iter
 
-		# attributes
 		# model coefficient
 		self.theta = None
 		# f function of a linear model
@@ -64,17 +58,15 @@ class RidgeRegression:
 		The gradient descent of the model
 		"""
 
-		# predicted y
-		y_pred = np.dot(dataset.x, self.theta) + self.theta_zero  # corresponds to the classical function of
-		# y = mx + b
+		# predicted y values
+		# corresponds to the classical function of y = mx + b
+		y_pred = np.dot(dataset.x, self.theta) + self.theta_zero
 
 		# computing and updating the gradient with the learning rate
-		gradient = (self.alpha * (1 / m)) * np.dot(y_pred - dataset.y, dataset.x)  # calculates the
-		# gradient of the cost function
-		# np.dot sums the colum values of the multiplication arrays
-		# learning rate is multiplicated by 1/m to normalize the rate to the dataset size
-
+		# alpha is normalized to be the same size as the dataset
+		gradient = (self.alpha * (1 / m)) * np.dot(y_pred - dataset.y, dataset.x)
 		# computing the penalty
+		# prevents ajustments
 		penalization_term = self.alpha * (self.l2_penalty / m) * self.theta
 
 		# updating the model parameters
@@ -98,17 +90,18 @@ class RidgeRegression:
 		m, n = dataset.shape()
 
 		# initialize the model parameters
+		# size = number of features
 		self.theta = np.zeros(n)
 		self.theta_zero = 0
 
+		# gradient descent
 		for i in range(self.max_iter):
-			self.gradient_descent(dataset, m) #gradient descent
+			self.gradient_descent(dataset, m)
 			# creats the dictionary keys
 			self.cost_history[i] = self.cost(dataset)
-
+			# checks if there is any difference between the cost of the previous and the current iteration
 			if i != 0 and self.cost_history[i-1] - self.cost_history[i] < 1:
 				break
-
 		return self
 
 
@@ -132,12 +125,14 @@ class RidgeRegression:
 		self.theta = np.zeros(n)
 		self.theta_zero = 0
 
+		# gradient descent
 		for i in range(self.max_iter):
-			self.gradient_descent(dataset, m) #gradient descent
+			self.gradient_descent(dataset, m)
 			# creats the dictionary keys
 			self.cost_history[i] = self.cost(dataset)
 
 			if i != 0 and self.cost_history[i-1] - self.cost_history[i] < 1:
+				# updating the learning rate
 				self.alpha = self.alpha/2
 		return self
 
@@ -200,8 +195,33 @@ class RidgeRegression:
 		The cost function of the model
 		"""
 		y_pred = self.predict(dataset)
-
 		cost_function = (np.sum((y_pred - dataset.y) ** 2) + (self.l2_penalty * np.sum(self.theta ** 2))) / (2 * len(dataset.y))
-
 		return cost_function
 
+if __name__ == '__main__':
+    # import dataset
+    from si.data.dataset import Dataset
+
+    # make a linear dataset
+    X = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])
+    y = np.dot(X, np.array([1, 2])) + 3
+    dataset_ = Dataset(X=X, y=y)
+
+    # fit the model
+    model = RidgeRegression()
+    model.fit(dataset_)
+
+    # get coefs
+    print(f"Parameters: {model.theta}")
+
+    # compute the score
+    score = model.score(dataset_)
+    print(f"Score: {score}")
+
+    # compute the cost
+    cost = model.cost(dataset_)
+    print(f"Cost: {cost}")
+
+    # predict
+    y_pred_ = model.predict(Dataset(X=np.array([[3, 5]])))
+    print(f"Predictions: {y_pred_}")

@@ -17,7 +17,7 @@ def mse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return np.sum((y_true - y_pred) ** 2) / (len(y_true) * 2)
 
 
-def mse_derivative(y_true: np.ndarray, y_pred: np.ndarray):
+def mse_derivative(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
     """
     Computes the derivative of the Mean Squared Error (MSE) function.
 

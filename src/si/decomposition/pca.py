@@ -3,6 +3,10 @@ import numpy as np
 from si.data.dataset import Dataset
 
 class PCA:
+	""""
+    Linear algebra technique to reduce the dimensions of the dataset.
+    The PCA to be implemented uses the linear algebra technique SVD (Singular Value Decomposition)
+    """
 
 	def __init__(self, n_components: int = 2):
 		"""
@@ -11,6 +15,12 @@ class PCA:
 		Parameters
         ------------
 		n_components: Number of components to keep.
+
+		Attributes
+        ------------
+        mean: Mean of each sample of the dataset.
+        components: Main components matches the first n_components of Vt.
+        explained_variance: Explained_variance matches first n_components of EV.
 		"""
 		self.n_components = n_components
 		self.mean = None

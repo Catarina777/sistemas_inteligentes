@@ -7,8 +7,7 @@ import pandas as pd
 from si.data.dataset import Dataset
 
 
-def read_csv(filename: str, sep: str = ',', features: bool = False, label: bool = False) \
-        -> Dataset:
+def read_csv(filename: str, sep: str = ',', features: bool = False, label: bool = False) -> Dataset:
     """
     Reads csv files.
 
@@ -42,7 +41,7 @@ def read_csv(filename: str, sep: str = ',', features: bool = False, label: bool 
     return Dataset(features_dataframe, y, features_names, label_name)
 
 
-def write_csv(dataset: Dataset, filename: str, sep: str = ',', features: bool = False, label: bool = None):
+def write_csv(dataset: Dataset, filename: str, sep: str = ',', features: bool = False, label: bool = None) -> None:
     """
     Writes a csv file.
 
@@ -81,3 +80,7 @@ def write_csv(dataset: Dataset, filename: str, sep: str = ',', features: bool = 
 
     dataframe = pd.DataFrame(data=results, columns=labels)
     dataframe.to_csv(filename, sep=sep, index=False)
+
+if __name__ == '__main__':
+    df = read_csv(filename="datasets/iris.csv", sep=',')
+    print(df.shape())
