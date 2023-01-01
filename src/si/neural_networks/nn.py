@@ -14,16 +14,32 @@ class NN:
 	The algorithm for fitting the model is based on backpropagation.
 	"""
 
-	def __init__(self, layers: list):
+	def __init__(self, layers: list, epochs: int = 1000, learning_rate: float = 0.01, loss: callable = mse, loss_derivative: callable = mse_derivative, verbose: bool = False):
 		"""
 		Initialize the NN.
 
 		Parameters
 		------------
 		layers: List of layers that are part of the neural network
+		epochs: Number of epochs to train the model.
+		learning_rate: The learning rate of the model.
+		loss:The loss function to use.
+		loss_derivative: The derivative of the loss function to use.
+		verbose: Whether to print the loss at each epoch.
+
+		Attributes
+		------------
+		history: The history of the model training.
 		"""
 		# parameters
 		self.layers = layers
+		self.epochs = epochs
+		self.learning_rate = learning_rate
+		self.loss = loss
+		self.loss_derivative = loss_derivative
+		self.verbose = verbose
+
+		self.history = {}
 
 	def fit(self, dataset: Dataset) -> "NN":
 		"""
@@ -37,13 +53,28 @@ class NN:
 		------------
 		Trained neural network.
 		"""
-		# pointer to the input data, a more correct way would be to copy the data (x = dataset.x.copy())
-		x = dataset.x
-		for layer in self.layers:
-			# if we were to use the dataset.x we would be using the original data, but we want to use the data that was already processed by the previous layer
-			x = layer.forward(x)
+		for epoch in range(1, self.epochs + 1):
 
-		return self
+			y_pred = dataset.x.copy()
+			y_true = np.reshape(dataset.y,(-1,1))
+
+			# forward propagation
+			for layer in self.layers:
+				y_pred = layer.forward(y_pred)
+
+			# backward propagation
+			error = self.loss_derivative(y_true, y_pred)
+			for layer in self.layers[::-1]:
+				error = layer.backward(error, self.learning_rate)
+
+			# save history
+			cost = self.loss(y_true, y_pred)
+			self.history[epoch] = cost
+
+			# print loss
+			if self.verbose:
+				print(f'Epoch {epoch}/{self.epochs} - cost: {cost}')
+
 
 	def predict(self, dataset: Dataset) -> np.ndarray:
 		"""
@@ -62,6 +93,17 @@ class NN:
 		for layer in self.layers:
 			x = layer.forward(x)
 		return x
+
+	def cost(self, dataset: Dataset) -> float:
+		"""
+		It computes the cost of the model on the given dataset
+
+		Parameters
+		------------
+		dataset: The dataset to compute the cost on
+		"""
+		y_pred = self.predict(dataset)
+		return self.loss(dataset.y, y_pred)
 
 	def score(self, dataset: Dataset, score_func: Callable = accuracy) -> float:
 		"""

@@ -44,7 +44,7 @@ class KNNRegressor:
 		self.dataset = dataset
 		return self
 
-	def _get_closet_label(self, x: np.ndarray) -> Union[int, str]:
+	def _get_closet_label(self, x: np.ndarray):
 		"""
 		Calculates the class with the highest frequency.
 

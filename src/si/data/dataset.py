@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 from numpy import ndarray
 from pandas import isnull
+from typing import Tuple,Sequence
 
 
 class Dataset:
-	def __init__(self, x: ndarray, y: ndarray = None, features_names: list = None, label_name: str = None):
+	def __init__(self, x: ndarray, y: ndarray = None, features_names: Sequence[str] = None, label_name: str = None):
 		"""
 		Initializes the dataset.
 
@@ -23,9 +24,6 @@ class Dataset:
 			features_names = [str(i) for i in range(x.shape[1])]
 		else:
 			features_names = list(features_names)
-
-		if y is not None and label_name is None:
-			label_name = "y"
 
 		self.x = x
 		self.y = y
@@ -105,7 +103,7 @@ class Dataset:
 		------------
 		ndarray
 		"""
-		return np.min(self.x, axis=0)
+		return np.nanmin(self.x, axis=0)
 
 	def get_max(self) -> np.ndarray:
 		"""
@@ -115,7 +113,7 @@ class Dataset:
 		------------
 		ndarray
 		"""
-		return np.max(self.x, axis=0)
+		return np.nanmax(self.x, axis=0)
 
 	def dropna(self):
 		"""
@@ -158,11 +156,61 @@ class Dataset:
 			'var': self.get_variance()}
 		)
 
+	def from_dataframe(cls, df: pd.DataFrame, label: str = None):
+		"""
+		Creates a Dataset object from a pandas DataFrame
+
+		Parameters
+		------------
+		df: The DataFrame
+		label: The label name
+
+		Returns
+		------------
+		Dataset
+		"""
+		if label:
+			X = df.drop(label, axis=1).to_numpy()
+			y = df[label].to_numpy()
+		else:
+			X = df.to_numpy()
+			y = None
+
+		features = df.columns.tolist()
+		return cls(X, y, features=features, label=label)
+
+	def to_dataframe(self) -> pd.DataFrame:
+		"""
+		Converts the dataset to a pandas DataFrame
+		"""
+		if self.y is None:
+			return pd.DataFrame(self.X, columns=self.features)
+		else:
+			df = pd.DataFrame(self.X, columns=self.features)
+			df[self.label] = self.y
+			return df
+
+	@classmethod
+	def from_random(cls, n_samples: int, features_names: int, n_classes: int = 2, features = None, label_name: str = None):
+		"""
+		Creates a Dataset object from random data
+
+		Parameters
+		------------
+		n_samples: The number of samples
+		n_features: The number of features
+		n_classes: The number of classes
+		features: The feature names
+		label: The label name
+		"""
+		X = np.random.rand(n_samples, features_names)
+		y = np.random.randint(0, n_classes, n_samples)
+		return cls(X, y, features_names=features_names, label_name=label_name)
 
 if __name__ == '__main__':
-    x1 = np.array([[1,2,3], [2,4,6], [3,np.nan,7], [8,6,np.nan]])
-    y1 = np.array([2,4,5])
-    dataset2 = Dataset(X=x1, y=y1)
-    print(dataset2.shape())  # before
-    dataset2.dropna()
-    print(dataset2.shape())
+	x1 = np.array([[1,2,3], [2,4,6], [3,np.nan,7], [8,6,np.nan]])
+	y1 = np.array([2,4,5])
+	dataset2 = Dataset(X=x1, y=y1)
+	print(dataset2.shape())  # before
+	dataset2.dropna()
+	print(dataset2.shape())

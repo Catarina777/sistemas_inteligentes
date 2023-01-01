@@ -1,5 +1,5 @@
 import numpy as np
-from src.si.statistics.sigmoid_function import sigmoid_function
+from si.statistics.sigmoid_function import sigmoid_function
 
 
 class Dense:
@@ -20,21 +20,23 @@ class Dense:
 		weights: The weights matrix
 		bias: A bias vector
 		"""
+		if input_size < 1:
+			raise ValueError("input_size must be an integer greater than 1")
+
+		if output_size < 1:
+			raise ValueError("output_size must be an integer greater than 1")
+
 		# parameters
 		self.input_size = input_size
 		self.output_size = output_size
 
-		# attributes
-		# weight matriz initialization
-		shape = (input_size, output_size)
-
 		self.x = None
 		# 0.01 is a hyperparameter to avoid exploding gradients
-		self.weights = np.random.randn(*shape) * 0.01
+		self.weights = np.random.randn(input_size, output_size) * 0.01
 		# each layer receives a weight that multiplies by the input that are then summed bias initialization, receives a bias to avoid overfitting
 		self.bias = np.zeros((1, output_size))
 
-	def forward(self, x: np.ndarray) -> np.ndarray:
+	def forward(self, input_data: np.ndarray) -> np.ndarray:
 		"""
 		Computes the forward pass of the layer.
 
@@ -46,10 +48,10 @@ class Dense:
 		------------
 		Input data multiplied by the weights.
 		"""
-		self.x = x
+		self.x = input_data
 		# the input_data needs to be a matrix with the same number of columns as the number of features
 		# the number os columns of the input_data must be equal to the number of rows of the weights
-		return np.dot(x, self.weights) + self.bias
+		return np.dot(input_data, self.weights) + self.bias
 
 	def backward(self, error: np.ndarray, learning_rate: float = 0.01) -> np.ndarray:
 		"""
@@ -64,15 +66,11 @@ class Dense:
 		------------
 		Error of the previous layer.
 		"""
-
 		error_to_propagate = np.dot(error, self.weights.T)
-
 		# updates the weights and bias
-		self.weights = self.weights - learning_rate * np.dot(self.x.T, error)
-
+		self.weights = self.weights - learning_rate * np.dot(self.X.T, error)
 		# sum because the bias has the dimension of nodes
-		self.bias = self.bias - learning_rate * np.sum(error, axis=0)
-
+		self.bias = self.bias - learning_rate * np.sum(error, axis = 0)
 		return error_to_propagate
 
 
@@ -85,8 +83,7 @@ class SigmoidActivation:
 		# attribute
 		self.x = None
 
-	@staticmethod
-	def forward(input_data: np.ndarray) -> np.ndarray:
+	def forward(self, input_data: np.ndarray) -> np.ndarray:
 		"""
 		Computes the forward pass of the layer.
 
@@ -98,6 +95,7 @@ class SigmoidActivation:
 		------------
 		Input data multiplied by the weights.
 		"""
+		self.X = input_data
 		return sigmoid_function(input_data)
 
 	def backward(self, error: np.ndarray) -> np.ndarray:
@@ -122,8 +120,7 @@ class SoftMaxActivation:
 	def __init__(self):
 		self.X = None
 
-	@staticmethod
-	def forward(input_data: np.ndarray) -> np.ndarray:
+	def forward(self, input_data: np.ndarray) -> np.ndarray:
 		"""
 		Computes the probability of each class.
 
@@ -135,11 +132,9 @@ class SoftMaxActivation:
 		------------
 		Probability of each class.
 		"""
-
-		zi_exp = np.exp(input_data - np.max(input_data))
-		# axis=1 means that the sum is done by row
-		formula = zi_exp / np.sum(zi_exp, axis=1, keepdims=True)
-		return formula
+		self.X = input_data
+		exp = np.exp(input_data - np.max(input_data))
+		return  exp / np.sum(exp, axis = 1, keepdims = True)
 
 	def backward(self, error: np.ndarray) -> np.ndarray:
 		"""
@@ -185,8 +180,8 @@ class ReLUActivation:
 		Rectified linear relationship.
 		"""
 		# maximum between 0 and the input_data, the 0 is to avoid negative values
-		data_pos = np.maximum(0, input_data)
-		return data_pos
+		self.X = input_data
+		return  np.maximum(0, input_data)
 
 	def backward(self, error: np.ndarray) -> np.ndarray:
 		"""
@@ -205,7 +200,7 @@ class LinearActivation:
 	def __init__(self):
 		self.X = None
 
-	def forward(input_data: np.ndarray) -> np.ndarray:
+	def forward(self, input_data: np.ndarray) -> np.ndarray:
 		"""
 		Computes the linear relationship.
 
@@ -217,6 +212,7 @@ class LinearActivation:
 		------------
 		Linear relationship.
 		"""
+		self.X = input_data
 		return input_data
 
 	def backward(self, error: np.ndarray, learning_rate: float) -> np.ndarray:
